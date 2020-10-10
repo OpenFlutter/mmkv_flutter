@@ -6,6 +6,7 @@ homepage: https://github.com/yuyongmao/mmkv_flutter
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
   flutter:
@@ -17,8 +18,12 @@ dependencies:
 # The following section is specific to Flutter.
 flutter:
   plugin:
-    androidPackage: com.bigbug.mmkvflutter
-    pluginClass: MmkvFlutterPlugin
+    platforms:
+      android:
+        package: com.bigbug.mmkvflutter
+        pluginClass: MmkvFlutterPlugin
+      ios:
+        pluginClass: MmkvFlutterPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
