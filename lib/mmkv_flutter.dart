@@ -25,12 +25,16 @@ class MmkvFlutter {
   }
 
   /// Reads a value from persistent storage, throwing an exception if it's not a bool.
-  Future<bool> getBool(String key) async{
+  Future<bool> getBool(String key) async {
     if (_mmkvCache.containsKey(key)) {
       return _mmkvCache[key];
     } else {
-      final Map<String, dynamic> params = <String, dynamic>{KEY: '$_prefix$key'};
-      return await _channel.invokeMethod('getBool', params).then<bool>((result){
+      final Map<String, dynamic> params = <String, dynamic>{
+        KEY: '$_prefix$key'
+      };
+      return await _channel
+          .invokeMethod('getBool', params)
+          .then<bool>((result) {
         _mmkvCache[key] = result;
         return result;
       });
@@ -38,14 +42,16 @@ class MmkvFlutter {
   }
 
   /// Reads a value from persistent storage, throwing an exception if it's not an int.
-  Future<int> getInt(String key) async{
+  Future<int> getInt(String key) async {
     if (_mmkvCache.containsKey(key)) {
       print('get value from catch');
       return _mmkvCache[key];
     } else {
       print('get value from channel');
-      final Map<String, dynamic> params = <String, dynamic>{KEY: '$_prefix$key'};
-      return await _channel.invokeMethod('getInt', params).then<int>((result){
+      final Map<String, dynamic> params = <String, dynamic>{
+        KEY: '$_prefix$key'
+      };
+      return await _channel.invokeMethod('getInt', params).then<int>((result) {
         _mmkvCache[key] = result;
         return result;
       });
@@ -53,12 +59,14 @@ class MmkvFlutter {
   }
 
   /// Reads a value from persistent storage, throwing an exception if it's not a long.
-  Future<int> getLong(String key)async{
+  Future<int> getLong(String key) async {
     if (_mmkvCache.containsKey(key)) {
       return _mmkvCache[key];
     } else {
-      final Map<String, dynamic> params = <String, dynamic>{KEY: '$_prefix$key'};
-      return await _channel.invokeMethod('getLong', params).then<int>((result){
+      final Map<String, dynamic> params = <String, dynamic>{
+        KEY: '$_prefix$key'
+      };
+      return await _channel.invokeMethod('getLong', params).then<int>((result) {
         _mmkvCache[key] = result;
         return result;
       });
@@ -66,12 +74,16 @@ class MmkvFlutter {
   }
 
   /// Reads a value from persistent storage, throwing an exception if it's not a double.
-  Future<double> getDouble(String key)async{
+  Future<double> getDouble(String key) async {
     if (_mmkvCache.containsKey(key)) {
       return _mmkvCache[key];
     } else {
-      final Map<String, dynamic> params = <String, dynamic>{KEY: '$_prefix$key'};
-      return await _channel.invokeMethod('getDouble', params).then<double>((result){
+      final Map<String, dynamic> params = <String, dynamic>{
+        KEY: '$_prefix$key'
+      };
+      return await _channel
+          .invokeMethod('getDouble', params)
+          .then<double>((result) {
         _mmkvCache[key] = result;
         return result;
       });
@@ -79,19 +91,21 @@ class MmkvFlutter {
   }
 
   /// Reads a value from persistent storage, throwing an exception if it's not a string.
-  Future<String> getString(String key)async{
+  Future<String> getString(String key) async {
     if (_mmkvCache.containsKey(key)) {
       return _mmkvCache[key];
     } else {
-      final Map<String, dynamic> params = <String, dynamic>{KEY: '$_prefix$key'};
-      return await _channel.invokeMethod('getString', params).then<String>((result){
+      final Map<String, dynamic> params = <String, dynamic>{
+        KEY: '$_prefix$key'
+      };
+      return await _channel
+          .invokeMethod('getString', params)
+          .then<String>((result) {
         _mmkvCache[key] = result;
         return result;
       });
     }
   }
-
-
 
   /// Saves a boolean [value] to persistent storage in the background.
   ///
@@ -111,32 +125,46 @@ class MmkvFlutter {
   /// Saves a double  [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [removeByKey()] on the [key].
-  Future<bool> setDouble(String key, double value) => _setValue('Double', key, value);
+  Future<bool> setDouble(String key, double value) =>
+      _setValue('Double', key, value);
 
   /// Saves a string  [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [removeByKey()] on the [key].
-  Future<bool> setString(String key, String value) => _setValue('String', key, value);
+  Future<bool> setString(String key, String value) =>
+      _setValue('String', key, value);
 
   /// Removes an entry from persistent storage.
   Future<bool> removeByKey(String key) => _setValue(null, key, null);
+
+  /// Removes an entry from memory cache only
+  /// 新增：只删Flutter侧的缓存
+  Future<bool> removeMemoryCacheByKey(String key) => _mmkvCache.remove(key);
 
   Future<bool> _setValue(String valueType, String key, Object value) async {
     final Map<String, dynamic> params = <String, dynamic>{KEY: '$_prefix$key'};
 
     if (value == null) {
       _mmkvCache.remove(key);
-      return await _channel.invokeMethod('removeByKey', params).then<bool>((dynamic result) => result);
+      return await _channel
+          .invokeMethod('removeByKey', params)
+          .then<bool>((dynamic result) => result);
     } else {
       _mmkvCache[key] = value;
       params[VALUE] = value;
-      return await _channel.invokeMethod('set$valueType', params).then<bool>((dynamic result) => result);
+      return await _channel
+          .invokeMethod('set$valueType', params)
+          .then<bool>((dynamic result) => result);
     }
   }
 
   /// Completes with true once the user preferences for the app has been cleared.
-  Future<bool> clear() async {
+  Future<bool> clear({bool prefixing = true}) async {
     _mmkvCache.clear();
-    return await _channel.invokeMethod('clear');
+
+    /// 改动：指定删除带有'mmkv.flutter.'前缀的key
+    /// 旧版本默认删整个'defaultMMKV'里面的内容，容易影响到原生
+    final Map<String, dynamic> params = <String, dynamic>{'prefixing': prefixing};
+    return await _channel.invokeMethod('clear', params);
   }
 }

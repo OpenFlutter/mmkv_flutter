@@ -16,6 +16,7 @@ public class MmkvFlutterPlugin implements MethodCallHandler {
 
   public static final String KEY="key";
   public static final String VALUE="value";
+  public static final String PREFIX="mmkv.flutter.";
 
   private final MMKV mmkv;
 
@@ -85,7 +86,18 @@ public class MmkvFlutterPlugin implements MethodCallHandler {
           result.success(true);
           break;
         case "clear":
-          mmkv.clearAll();
+          /// 改动：是否只需要删带有'mmkv.flutter.'前缀的key
+          boolean prefixing = (boolean) call.argument("prefixing");
+          if (prefixing) {
+            String [] allKeys = mmkv.allKeys();
+            for(String obj : allKeys) {
+              if (obj.startsWith(PREFIX)) {
+                mmkv.removeValueForKey(obj);
+              }
+            }
+          } else  {
+            mmkv.clearAll();
+          }
           result.success(true);
           break;
         default:
