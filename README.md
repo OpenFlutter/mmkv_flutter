@@ -24,3 +24,10 @@ Open terminal, cd to your project directory, run pod repo update to make CocoaPo
   await mmkv.setString('stringKey', stringtest);
 
 ```
+
+## Change Log
+
+**1.1.2**  `2020.10.10`
+
+> * 新增仅删除Flutter侧缓存（remove from flutter mmkvCache）
+> * 执行clear操作时，默认删除带'mmkv.flutter.'前缀的key，不会清空defaultMMKV缓存池

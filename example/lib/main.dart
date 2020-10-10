@@ -12,7 +12,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   _incrementCounter() async {
     MmkvFlutter mmkv = await MmkvFlutter.getInstance();
     int counter = await mmkv.getInt('intKey') + 1;
